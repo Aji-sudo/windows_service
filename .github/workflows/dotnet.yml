@@ -93,7 +93,7 @@ jobs:
 
     - name: Verify File Movement
       run: |
-        if (Test-Path -Path "DestinationFolder1/testfile.txt") {
+        if (Test-Path -Path "DestinationFolder6/testfile.txt") {
           Write-Host "File moved successfully to DestinationFolder1."
         } else {
           Write-Error "File was not moved to DestinationFolder1."
