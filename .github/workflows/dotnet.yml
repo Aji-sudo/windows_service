@@ -4,11 +4,58 @@
 # This workflow will build and run a .NET project as a Windows service
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
+# name: Running Windows Service
+
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+# jobs:
+#   build-and-run:
+#     runs-on: windows-latest
+
+#     steps:
+#     - uses: actions/checkout@v4
+    
+#     # Set up .NET environment
+#     - name: Setup .NET
+#       uses: actions/setup-dotnet@v4
+#       with:
+#         dotnet-version: 8.0.x
+
+#     # Restore dependencies
+#     - name: Restore dependencies
+#       run: dotnet restore
+
+#     # Build the project
+#     - name: Build
+#       run: dotnet build --no-restore
+
+#     # Publish the service to a specified output directory
+#     - name: Publish Windows Service
+#       run: dotnet publish --configuration Release --output ./publish
+
+#     # Run the Windows Service application
+#     - name: Run Windows Service
+#       run: dotnet run --project "./filemonitoring1.csproj"
+    
+#     # Verify the service status (Optional Step)
+#     - name: Verify Service Status
+#       run: |
+#         Write-Host "Service should be running now."
+#         Write-Host "Ensure files are dynamically processed in 'SourceFolder1'."
+
+
 name: Running Windows Service
 
 on:
   push:
     branches: [ "main" ]
+    paths-ignore: # Prevent triggering on changes to folders
+      - 'SourceFolder1/**'
+      - 'DestinationFolder1/**'
   pull_request:
     branches: [ "main" ]
 
@@ -17,33 +64,41 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    # Step 1: Check out the repo
     - uses: actions/checkout@v4
-    
-    # Set up .NET environment
+
+    # Step 2: Setup .NET environment
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    # Restore dependencies
+    # Step 3: Restore dependencies
     - name: Restore dependencies
       run: dotnet restore
 
-    # Build the project
+    # Step 4: Build the project
     - name: Build
       run: dotnet build --no-restore
 
-    # Publish the service to a specified output directory
-    - name: Publish Windows Service
-      run: dotnet publish --configuration Release --output ./publish
-
-    # Run the Windows Service application
-    - name: Run Windows Service
-      run: dotnet run --project "./filemonitoring1.csproj"
-    
-    # Verify the service status (Optional Step)
-    - name: Verify Service Status
+    # Step 5: Ensure folders exist
+    - name: Set up folders for file monitoring
       run: |
-        Write-Host "Service should be running now."
-        Write-Host "Ensure files are dynamically processed in 'SourceFolder1'."
+        mkdir SourceFolder1
+        mkdir DestinationFolder1
+        echo "Test content" > SourceFolder1/testfile.txt
+
+    # Step 6: Run the Windows Service
+    - name: Run Windows Service
+      run: dotnet run --project "filemonitoring1.csproj"
+
+    # Step 7: Verify that files moved successfully
+    - name: Verify File Movement
+      run: |
+        if (Test-Path -Path "DestinationFolder1/testfile.txt") {
+          Write-Host "File moved successfully to DestinationFolder1."
+        } else {
+          Write-Error "File was not moved to DestinationFolder1."
+        }
+      shell: pwsh
 
