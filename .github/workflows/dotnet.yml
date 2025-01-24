@@ -1,13 +1,22 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-netn=e
 
+# This workflow will build and run a .NET project as a Windows service
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
 name: Running Windows Service
 
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'SourceFolder1/**'
+      - 'DestinationFolder1/**'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'SourceFolder1/**'
+      - 'DestinationFolder1/**'
 
 jobs:
   build-and-run:
@@ -15,23 +24,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    # Set up .NET environment
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
+    # Restore dependencies
     - name: Restore dependencies
       run: dotnet restore
 
+    # Build the project
     - name: Build
       run: dotnet build --no-restore
 
+    # Publish the service to a specified output directory
     - name: Publish Windows Service
       run: dotnet publish --configuration Release --output ./publish
 
+    # Run the Windows Service application
     - name: Run Windows Service
-      run: dotnet run --project "filemonitoring1.csproj"  
- 
+      run: dotnet run --project "./filemonitoring1.csproj"
+    
+    # Verify the service status (Optional Step)
     - name: Verify Service Status
       run: |
         Write-Host "Service should be running now."
+        Write-Host "Ensure files are dynamically processed in 'SourceFolder1'."
+
