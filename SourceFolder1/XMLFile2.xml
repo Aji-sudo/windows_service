@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Vendors>
+	<Vendor>
+		<VendorID>V1001</VendorID>
+		<Name>Global Supplies Inc.</Name>
+		<Contact>
+			<Phone>+1-555-234-5678</Phone>
+			<Email>info@globalsupplies.com</Email>
+		</Contact>
+		<Address>
+			<Street>789 Industrial Park</Street>
+			<City>Houston</City>
+			<State>TX</State>
+			<ZipCode>77002</ZipCode>
+			<Country>USA</Country>
+		</Address>
+		<Products>
+			<Product>
+				<ProductID>P101</ProductID>
+				<Name>Office Chair</Name>
+				<Category>Furniture</Category>
+				<Price>120.50</Price>
+			</Product>
+			<Product>
+				<ProductID>P102</ProductID>
+				<Name>Desk Lamp</Name>
+				<Category>Electronics</Category>
+				<Price>45.00</Price>
+			</Product>
+		</Products>
+	</Vendor>
+	<Vendor>
+		<VendorID>V1002</VendorID>
+		<Name>Eco Goods Ltd.</Name>
+		<Contact>
+			<Phone>+44-20-7946-0958</Phone>
+			<Email>contact@ecogoods.co.uk</Email>
+		</Contact>
+		<Address>
+			<Street>123 Green Lane</Street>
+			<City>London</City>
+			<State>England</State>
+			<ZipCode>EC1A 1BB</ZipCode>
+			<Country>UK</Country>
+		</Address>
+		<Products>
+			<Product>
+				<ProductID>P201</ProductID>
+				<Name>Reusable Water Bottle</Name>
+				<Category>Household</Category>
+				<Price>15.75</Price>
+			</Product>
+			<Product>
+				<ProductID>P202</ProductID>
+				<Name>Bamboo Cutlery Set</Name>
+				<Category>Kitchen</Category>
+				<Price>25.30</Price>
+			</Product>
+		</Products>
+	</Vendor>
+</Vendors>
