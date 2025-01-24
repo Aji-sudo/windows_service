@@ -334,8 +334,8 @@ using Microsoft.Extensions.Logging;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private readonly string _sourceFolder = @"SourceFolder1";   // Folder to monitor
-    private readonly string _tempFolder = @"DestinationFolder1";      // Temporary folder
+    private readonly string _sourceFolder = @"SourceFolder2";   // Folder to monitor
+    private readonly string _tempFolder = @"DestinationFolder2";      // Temporary folder
     private FileSystemWatcher _fileWatcher;
  
     public Worker(ILogger<Worker> logger)
