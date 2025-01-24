@@ -26,3 +26,5 @@ jobs:
       run: dotnet test --no-build --verbosity normal
     - name: Publish Windows Service
       run: dotnet publish --configuration Release --output ./publish
+    - name: Run Windows Service
+      run: dotnet run
