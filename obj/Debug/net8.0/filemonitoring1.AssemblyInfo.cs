@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("filemonitoring1")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef06ddfedf5dd1df137c44792c61aa5cd98ea3df")]
 [assembly: System.Reflection.AssemblyProductAttribute("filemonitoring1")]
 [assembly: System.Reflection.AssemblyTitleAttribute("filemonitoring1")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
