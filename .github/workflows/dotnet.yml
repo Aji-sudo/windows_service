@@ -31,14 +31,13 @@ jobs:
 
     - name: Run Windows Service
       run: |
-        # Run the Windows Service using dotnet run
-        Start-Process "dotnet" "run --project C:\\Users\\AG2802\\Downloads\\filemonitoring1 (2)\\filemonitoring1\\filemonitoring1\\filemonitoring1.csproj" -NoNewWindow -Wait
+        # Ensure that the path is wrapped in quotes, and fix any space-related issues
+        $csprojPath = "C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\filemonitoring1.csproj"
+        Start-Process "dotnet" "run --project `"$csprojPath`"" -NoNewWindow -Wait
         # Wait to ensure the service runs and does its job
         Start-Sleep -Seconds 10  # Adjust time based on service activity
 
     - name: Verify Service Status
       run: |
         # Check if the service is running or performing expected actions
-        # You can check logs or other status indicators based on your service implementation
         Write-Host "Service should be running now."
-
