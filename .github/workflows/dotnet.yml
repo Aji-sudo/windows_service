@@ -9,14 +9,8 @@ name: Running Windows Service
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - 'SourceFolder1/**'
-      - 'DestinationFolder1/**'
   pull_request:
     branches: [ "main" ]
-    paths-ignore:
-      - 'SourceFolder1/**'
-      - 'DestinationFolder1/**'
 
 jobs:
   build-and-run:
