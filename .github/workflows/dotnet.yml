@@ -30,8 +30,8 @@ jobs:
       run: dotnet publish --configuration Release --output ./publish
 
     - name: Run Windows Service
-      run: dotnet run --project "C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\filemonitoring1.csproj"
-
+      run: dotnet run --project "./filemonitoring1/filemonitoring1.csproj"  
+ 
     - name: Verify Service Status
       run: |
         Write-Host "Service should be running now."
