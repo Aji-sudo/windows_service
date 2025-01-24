@@ -1,0 +1,2 @@
+filename,first_name,last_name,member_dob,encounter_date,member_id
+H123456789_1234,John,Doe,1985-04-15,2023-06-15,H123456789
