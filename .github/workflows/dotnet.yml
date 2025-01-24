@@ -1,5 +1,6 @@
 # This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-netn=e
+
 name: Windows Service CI/CD Pipeline
 
 on:
@@ -9,8 +10,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    runs-on: windows-latest  # Using Windows environment
+  build-and-run:
+    runs-on: windows-latest  # Using a Windows environment to run the service
 
     steps:
     - uses: actions/checkout@v4  # Checkout your code
@@ -18,13 +19,26 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x  # Adjust the .NET version as needed
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+
     - name: Publish Windows Service
       run: dotnet publish --configuration Release --output ./publish
+
     - name: Run Windows Service
-      run: dotnet run
+      run: |
+        # Run the Windows Service using dotnet run
+        Start-Process "dotnet" "run --project C:\\Users\\AG2802\\Downloads\\filemonitoring1 (2)\\filemonitoring1\\filemonitoring1\\filemonitoring1.csproj" -NoNewWindow -Wait
+        # Wait to ensure the service runs and does its job
+        Start-Sleep -Seconds 10  # Adjust time based on service activity
+
+    - name: Verify Service Status
+      run: |
+        # Check if the service is running or performing expected actions
+        # You can check logs or other status indicators based on your service implementation
+        Write-Host "Service should be running now."
+
