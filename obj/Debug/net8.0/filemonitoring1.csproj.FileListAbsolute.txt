@@ -96,3 +96,4 @@ C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\ob
 C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\obj\Debug\net8.0\filemonitoring1.pdb
 C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\obj\Debug\net8.0\filemonitoring1.genruntimeconfig.cache
 C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\obj\Debug\net8.0\ref\filemonitoring1.dll
+C:\Users\AG2802\Downloads\filemonitoring1 (2)\filemonitoring1\filemonitoring1\obj\Debug\net8.0\filemonitoring1.sourcelink.json
