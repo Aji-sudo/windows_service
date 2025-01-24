@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root>
+    <Data>
+        <Item>
+            <Id>123</Id>
+            <Name>Item A</Name>
+            <Description>Sample item description</Description>
+        </Item>
+        <Item>
+            <Id>124</Id>
+            <Name>Item B</Name>
+            <Description>Another item description</Description>
+        </Item>
+    </Data>
+</Root>
