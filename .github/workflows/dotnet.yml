@@ -53,9 +53,6 @@ name: Running Windows Service
 on:
   push:
     branches: [ "main" ]
-    paths-ignore: # Prevent triggering on changes to folders
-      - 'SourceFolder1/**'
-      - 'DestinationFolder1/**'
   pull_request:
     branches: [ "main" ]
 
@@ -64,35 +61,36 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # Step 1: Check out the repo
     - uses: actions/checkout@v4
 
-    # Step 2: Setup .NET environment
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
 
-    # Step 3: Restore dependencies
     - name: Restore dependencies
       run: dotnet restore
 
-    # Step 4: Build the project
     - name: Build
       run: dotnet build --no-restore
 
-    # Step 5: Ensure folders exist
-    # - name: Set up folders for file monitoring
-    #   run: |
-    #     mkdir SourceFolder1
-    #     mkdir DestinationFolder1
-    #     echo "Test content" > SourceFolder1/testfile.txt
+    - name: Publish Windows Service
+      run: dotnet publish --configuration Release --output ./publish
 
-    # Step 6: Run the Windows Service
+    - name: Create Test Folders and Files
+      run: |
+        mkdir SourceFolder1
+        mkdir DestinationFolder1
+        echo "This is a test file" > SourceFolder1/testfile.txt
+
     - name: Run Windows Service
       run: dotnet run --project "filemonitoring1.csproj"
 
-    # Step 7: Verify that files moved successfully
+    - name: Wait for File Movement
+      run: |
+        echo "Waiting for file movement..."
+        Start-Sleep -Seconds 5 # Wait to ensure the file watcher has time to act
+
     - name: Verify File Movement
       run: |
         if (Test-Path -Path "DestinationFolder1/testfile.txt") {
@@ -100,5 +98,5 @@ jobs:
         } else {
           Write-Error "File was not moved to DestinationFolder1."
         }
-      shell: pwsh
+
 
