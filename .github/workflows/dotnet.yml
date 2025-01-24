@@ -30,7 +30,7 @@ jobs:
       run: dotnet publish --configuration Release --output ./publish
 
     - name: Run Windows Service
-      run: dotnet run --project "./filemonitoring1.csproj"  
+      run: dotnet run --project "filemonitoring1.csproj"  
  
     - name: Verify Service Status
       run: |
