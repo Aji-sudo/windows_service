@@ -82,11 +82,11 @@ jobs:
       run: dotnet build --no-restore
 
     # Step 5: Ensure folders exist
-    - name: Set up folders for file monitoring
-      run: |
-        mkdir SourceFolder1
-        mkdir DestinationFolder1
-        echo "Test content" > SourceFolder1/testfile.txt
+    # - name: Set up folders for file monitoring
+    #   run: |
+    #     mkdir SourceFolder1
+    #     mkdir DestinationFolder1
+    #     echo "Test content" > SourceFolder1/testfile.txt
 
     # Step 6: Run the Windows Service
     - name: Run Windows Service
