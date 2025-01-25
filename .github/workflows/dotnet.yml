@@ -47,7 +47,6 @@
 #         Write-Host "Service should be running now."
 #         Write-Host "Ensure files are dynamically processed in 'SourceFolder1'."
 
-
 name: Running Windows Service
 
 on:
@@ -83,20 +82,20 @@ jobs:
         mkdir DestinationFolder6
         echo "This is a test file" > SourceFolder6/testfile.txt
 
-    - name: Run Windows Service
-      run: dotnet run --project "filemonitoring1.csproj"
+    - name: Start Windows Service
+      run: |
+        cd ./publish
+        ./filemonitoring1.exe # Run the published service executable
 
     - name: Wait for File Movement
       run: |
         echo "Waiting for file movement..."
-        Start-Sleep -Seconds 5 # Wait to ensure the file watcher has time to act
+        Start-Sleep -Seconds 10 # Allow enough time for the service to process the file
 
     - name: Verify File Movement
       run: |
         if (Test-Path -Path "DestinationFolder6/testfile.txt") {
-          Write-Host "File moved successfully to DestinationFolder1."
+          Write-Host "File moved successfully to DestinationFolder6."
         } else {
-          Write-Error "File was not moved to DestinationFolder1."
+          Write-Error "File was not moved to DestinationFolder6."
         }
-
-
