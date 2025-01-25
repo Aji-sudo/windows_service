@@ -89,7 +89,7 @@ jobs:
 
     # Step 6: Run the Windows Service
     - name: Run Windows Service
-      run: dotnet run --project "$GITHUB_WORKSPACE/windows_service/filemonitoring1.csproj"
+      run: dotnet run --project "filemonitoring1.csproj"
 
     # Step 7: Verify that files moved successfully
     - name: Verify File Movement
