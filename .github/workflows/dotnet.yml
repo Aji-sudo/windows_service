@@ -100,7 +100,7 @@ jobs:
 
       - name: Start Windows Service
         run: |
-          cd $GITHUB_WORKSPACE/publish
+          cd $GITHUB_WORKSPACE/windows_service/publish
           Start-Process -FilePath 'filemonitoring1.exe' -NoNewWindow -Wait
 
       - name: Wait for File Movement
