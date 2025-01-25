@@ -80,18 +80,18 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
 
-    # Step 5: Ensure folders exist and create test file
-    - name: Set up folders for file monitoring
+    # Step 5: Ensure folders exist and create the test file
+    - name: Set up folders and create test file
       run: |
-        mkdir $GITHUB_WORKSPACE/SourceFolder6
-        mkdir $GITHUB_WORKSPACE/DestinationFolder6
-        echo "Test content" > $GITHUB_WORKSPACE/SourceFolder6/testfile.txt
+        mkdir -p $GITHUB_WORKSPACE/SourceFolder6
+        mkdir -p $GITHUB_WORKSPACE/DestinationFolder6
+        echo "This is a test file" > $GITHUB_WORKSPACE/SourceFolder6/testfile.txt
 
     # Step 6: Run the Windows Service
     - name: Run Windows Service
-      run: dotnet run --project "filemonitoring1.csproj"
+      run: dotnet run --project "$GITHUB_WORKSPACE/windows_service/filemonitoring1.csproj"
 
-    # Step 7: Verify that files moved successfully
+    # Step 7: Verify that the file was moved successfully
     - name: Verify File Movement
       run: |
         if (Test-Path -Path "$GITHUB_WORKSPACE/DestinationFolder6/testfile.txt") {
@@ -100,4 +100,3 @@ jobs:
           Write-Error "File was not moved to DestinationFolder6."
         }
       shell: pwsh
-
