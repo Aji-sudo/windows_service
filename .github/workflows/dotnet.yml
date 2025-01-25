@@ -90,7 +90,14 @@ jobs:
     - name: Wait for File Movement
       run: |
         echo "Waiting for file movement..."
-        Start-Sleep -Seconds 10 # Allow enough time for the service to process the file
+        Start-Sleep -Seconds 20 # Increased wait time for file movement
+
+    - name: Debug Folder Contents
+      run: |
+        echo "Source folder contents:"
+        Get-ChildItem -Path "SourceFolder6"
+        echo "Destination folder contents:"
+        Get-ChildItem -Path "DestinationFolder6"
 
     - name: Verify File Movement
       run: |
