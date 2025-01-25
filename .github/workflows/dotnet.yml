@@ -47,70 +47,72 @@
 #         Write-Host "Service should be running now."
 #         Write-Host "Ensure files are dynamically processed in 'SourceFolder1'."
 
-name: Running Windows Service
+name: Build, Publish, and Test Windows Service
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-  build-and-run:
+  build:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Set Up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore Dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore
+      - name: Build Solution
+        run: dotnet build --no-restore
 
-    - name: Publish Windows Service
-      run: dotnet publish --configuration Release --output ./publish
+      - name: Publish Windows Service
+        run: dotnet publish --configuration Release --output ./publish
 
-    - name: Create Test Folders and Files
-      run: |
-        mkdir -p ${{ github.workspace }}/SourceFolder6
-        mkdir -p ${{ github.workspace }}/DestinationFolder6
-        echo "This is a test file" > ${{ github.workspace }}/SourceFolder6/testfile.txt
+  test:
+    needs: build
+    runs-on: windows-latest
 
-    - name: Start Windows Service
-      run: |
-        cd ${{ github.workspace }}/publish
-        Start-Process -NoNewWindow -FilePath "./filemonitoring1.exe"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Wait for File Movement
-      run: |
-        echo "Waiting for file movement..."
-        Start-Sleep -Seconds 20 # Increased wait time for file movement
+      - name: Set Up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Debug Folder Contents
-      run: |
-        echo "Source folder contents:"
-        Get-ChildItem -Path "${{ github.workspace }}/SourceFolder6"
-        echo "Destination folder contents:"
-        Get-ChildItem -Path "${{ github.workspace }}/DestinationFolder6"
+      - name: Create Test Folders and Files
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/SourceFolder6
+          mkdir -p $GITHUB_WORKSPACE/DestinationFolder6
+          echo "This is a test file" > $GITHUB_WORKSPACE/SourceFolder6/testfile.txt
 
-    - name: Verify File Movement
-      run: |
-       $destinationPath = "D:\a\windows_service\windows_service\DestinationFolder6\testfile.txt"
-       if (Test-Path -Path $destinationPath) {
-        Write-Host "File moved successfully to DestinationFolder6."
-       } else {
-          Write-Error "File was not moved to DestinationFolder6."
-       }
-       shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
-        env:
-         DOTNET_ROOT: C:\Program Files\dotnet
+      - name: Start Windows Service
+        run: |
+          cd $GITHUB_WORKSPACE/publish
+          Start-Process -FilePath 'filemonitoring1.exe' -NoNewWindow -Wait
 
+      - name: Wait for File Movement
+        run: |
+          echo "Waiting for file movement..."
+          Start-Sleep -Seconds 20
 
-
-
+      - name: Verify File Movement
+        run: |
+          $destinationPath = "$GITHUB_WORKSPACE/DestinationFolder6/testfile.txt"
+          if (Test-Path -Path $destinationPath) {
+            Write-Host "File moved successfully to DestinationFolder6."
+          } else {
+            Write-Error "File was not moved to DestinationFolder6."
+          }
