@@ -332,10 +332,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
  
 public class Worker : BackgroundService
-{
+{ 
     private readonly ILogger<Worker> _logger;
-   private readonly string _sourceFolder = Path.Combine(Directory.GetCurrentDirectory(), "SourceFolder6");
-   private readonly string _tempFolder = Path.Combine(Directory.GetCurrentDirectory(), "DestinationFolder6");
+private readonly string _sourceFolder = Path.Combine(Environment.CurrentDirectory, "SourceFolder6");
+private readonly string _tempFolder = Path.Combine(Environment.CurrentDirectory, "DestinationFolder6");
+
       // Temporary folder
     private FileSystemWatcher _fileWatcher;
  
