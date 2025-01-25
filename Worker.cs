@@ -322,6 +322,7 @@
 //    }
 //}
 
+
 using System;
 using System.IO;
 using System.Threading;
@@ -332,81 +333,52 @@ using Microsoft.Extensions.Logging;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private readonly string _sourceFolder = Path.Combine(Directory.GetCurrentDirectory(), "SourceFolder6");
-    private readonly string _destinationFolder = Path.Combine(Directory.GetCurrentDirectory(), "DestinationFolder6");
-    private FileSystemWatcher _fileWatcher;
+    private readonly string _destinationFolder;
 
     public Worker(ILogger<Worker> logger)
     {
         _logger = logger;
+        // Retrieve the destination folder path from the environment variable
+        _destinationFolder = Path.Combine(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE"), "DestinationFolder6");
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Ensure the folders exist
-        if (!Directory.Exists(_sourceFolder)) Directory.CreateDirectory(_sourceFolder);
-        if (!Directory.Exists(_destinationFolder)) Directory.CreateDirectory(_destinationFolder);
-
-        // Initialize FileSystemWatcher
-        _fileWatcher = new FileSystemWatcher
-        {
-            Path = _sourceFolder,
-            NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
-            Filter = "*.*" // Monitor all file types
-        };
-
-        _fileWatcher.Created += OnFileCreated;
-        _fileWatcher.EnableRaisingEvents = true;
-
-        _logger.LogInformation($"Service started and monitoring folder: {_sourceFolder}");
-
-        return Task.CompletedTask;
-    }
-
-    private void OnFileCreated(object sender, FileSystemEventArgs e)
-    {
-        try
-        {
-            // Wait until the file is fully written
-            WaitForFile(e.FullPath);
-
-            string destinationPath = Path.Combine(_destinationFolder, Path.GetFileName(e.FullPath));
-
-            // Move the file to the destination folder
-            File.Move(e.FullPath, destinationPath);
-            _logger.LogInformation($"File moved: {e.FullPath} -> {destinationPath}");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error processing file: {e.FullPath}. Exception: {ex.Message}");
-        }
-    }
-
-    private void WaitForFile(string filePath)
-    {
-        int retryCount = 10; // Retry up to 10 times
-        while (retryCount > 0)
+        while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                using (FileStream fs = File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                // Ensure the destination folder exists
+                if (!Directory.Exists(_destinationFolder))
                 {
-                    fs.Close();
+                    Directory.CreateDirectory(_destinationFolder);
+                    _logger.LogInformation($"Created destination folder: {_destinationFolder}");
                 }
-                break;
+
+                // Define the source file path
+                string sourceFilePath = Path.Combine(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE"), "SourceFolder6", "testfile.txt");
+
+                // Check if the source file exists
+                if (File.Exists(sourceFilePath))
+                {
+                    string destinationFilePath = Path.Combine(_destinationFolder, "testfile.txt");
+
+                    // Move the file to the destination folder
+                    File.Move(sourceFilePath, destinationFilePath);
+                    _logger.LogInformation($"Moved file from {sourceFilePath} to {destinationFilePath}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Source file not found: {sourceFilePath}");
+                }
             }
-            catch (IOException)
+            catch (Exception ex)
             {
-                Thread.Sleep(500); // Wait for 500 ms
-                retryCount--;
+                _logger.LogError($"An error occurred: {ex.Message}");
             }
+
+            // Wait for a specified interval before checking again
+            await Task.Delay(10000, stoppingToken); // 10 seconds
         }
     }
-
-    public override void Dispose()
-    {
-        _fileWatcher?.Dispose();
-        base.Dispose();
-    }
 }
-
