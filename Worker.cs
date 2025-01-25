@@ -322,35 +322,31 @@
 //    }
 //}
 
-
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
- 
-public class Worker : BackgroundService
-{ 
-    private readonly ILogger<Worker> _logger;
-private readonly string _sourceFolder = Path.Combine(Environment.CurrentDirectory, "SourceFolder6");
-private readonly string _tempFolder = Path.Combine(Environment.CurrentDirectory, "DestinationFolder6");
 
-      // Temporary folder
+public class Worker : BackgroundService
+{
+    private readonly ILogger<Worker> _logger;
+    private readonly string _sourceFolder = Path.Combine(Directory.GetCurrentDirectory(), "SourceFolder6");
+    private readonly string _destinationFolder = Path.Combine(Directory.GetCurrentDirectory(), "DestinationFolder6");
     private FileSystemWatcher _fileWatcher;
- 
+
     public Worker(ILogger<Worker> logger)
     {
         _logger = logger;
     }
- 
+
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Ensure the folders exist
         if (!Directory.Exists(_sourceFolder)) Directory.CreateDirectory(_sourceFolder);
-        if (!Directory.Exists(_tempFolder)) Directory.CreateDirectory(_tempFolder);
- 
+        if (!Directory.Exists(_destinationFolder)) Directory.CreateDirectory(_destinationFolder);
+
         // Initialize FileSystemWatcher
         _fileWatcher = new FileSystemWatcher
         {
@@ -358,120 +354,35 @@ private readonly string _tempFolder = Path.Combine(Environment.CurrentDirectory,
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
             Filter = "*.*" // Monitor all file types
         };
- 
-        _fileWatcher.Created += async (sender, e) => await OnFileCreatedAsync(e);
+
+        _fileWatcher.Created += OnFileCreated;
         _fileWatcher.EnableRaisingEvents = true;
- 
-        _logger.LogInformation("Service started and monitoring folder: " + _sourceFolder);
- 
+
+        _logger.LogInformation($"Service started and monitoring folder: {_sourceFolder}");
+
         return Task.CompletedTask;
     }
- 
-    private async Task OnFileCreatedAsync(FileSystemEventArgs e)
+
+    private void OnFileCreated(object sender, FileSystemEventArgs e)
     {
         try
         {
             // Wait until the file is fully written
-            await WaitForFileAsync(e.FullPath);
- 
-            string tempFilePath = Path.Combine(_tempFolder, Path.GetFileName(e.FullPath));
- 
-            if (Path.GetExtension(e.FullPath).Equals(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                // Handle ZIP files: Extract contents to the temp folder
-                await ExtractZipFileAsync(e.FullPath, _tempFolder);
-                _logger.LogInformation($"ZIP file extracted: {e.FullPath} -> {_tempFolder}");
-            }
-            else
-            {
-                // Move other files to the temporary folder
-                File.Move(e.FullPath, tempFilePath);
-                _logger.LogInformation($"File moved: {e.FullPath} -> {tempFilePath}");
-            }
+            WaitForFile(e.FullPath);
+
+            string destinationPath = Path.Combine(_destinationFolder, Path.GetFileName(e.FullPath));
+
+            // Move the file to the destination folder
+            File.Move(e.FullPath, destinationPath);
+            _logger.LogInformation($"File moved: {e.FullPath} -> {destinationPath}");
         }
         catch (Exception ex)
         {
             _logger.LogError($"Error processing file: {e.FullPath}. Exception: {ex.Message}");
         }
     }
- 
-    //private async Task ExtractZipFileAsync(string zipFilePath, string destinationFolder)
-    //{
-    //    try
-    //    {
-    //        await Task.Run(() =>
-    //        {
-    //            using (FileStream zipToOpen = new FileStream(zipFilePath, FileMode.Open))
-    //            {
-    //                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
-    //                {
-    //                    foreach (ZipArchiveEntry entry in archive.Entries)
-    //                    {
-    //                        string destinationPath = Path.Combine(destinationFolder, entry.FullName);
- 
-    //                        // Ensure the directory exists
-    //                        Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
- 
-    //                        // Extract the file
-    //                        entry.ExtractToFile(destinationPath, overwrite: true);
-    //                        _logger.LogInformation($"Extracted: {entry.FullName} -> {destinationPath}");
-    //                    }
-    //                }
-    //            }
- 
-    //            // Optionally delete the original zip file after extraction
-    //            File.Delete(zipFilePath);
-    //            _logger.LogInformation($"ZIP file deleted: {zipFilePath}");
-    //        });
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError($"Error extracting ZIP file: {zipFilePath}. Exception: {ex.Message}");
-    //    }
-    //}
- 
-    private async Task ExtractZipFileAsync(string zipFilePath, string destinationFolder)
-    {
-        try
-        {
-            await Task.Run(() =>
-            {
-                using (FileStream zipToOpen = new FileStream(zipFilePath, FileMode.Open))
-                {
-                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
-                    {
-                        foreach (ZipArchiveEntry entry in archive.Entries)
-                        {
-                            ;
-                            string destinationPath = Path.Combine(destinationFolder, entry.FullName);
- 
-                            // Ensure that all directories in the path are created
-                            string directoryPath = Path.GetDirectoryName(destinationPath);
-                            if (!Directory.Exists(directoryPath))
-                            {
-                                Directory.CreateDirectory(directoryPath); // Create the directory if it doesn't exist
-                            }
- 
-                            // Extract the file
-                            entry.ExtractToFile(destinationPath, overwrite: true);
-                            _logger.LogInformation($"Extracted: {entry.FullName} -> {destinationPath}");
-                        }
-                    }
-                }
- 
-                // Optionally delete the original zip file after extraction
-                File.Delete(zipFilePath);
-                _logger.LogInformation($"ZIP file deleted: {zipFilePath}");
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Error extracting ZIP file: {zipFilePath}. Exception: {ex.Message}");
-        }
-    }
- 
- 
-    private async Task WaitForFileAsync(string filePath)
+
+    private void WaitForFile(string filePath)
     {
         int retryCount = 10; // Retry up to 10 times
         while (retryCount > 0)
@@ -486,8 +397,19 @@ private readonly string _tempFolder = Path.Combine(Environment.CurrentDirectory,
             }
             catch (IOException)
             {
-                await Task.Delay(500); // Wait for 500 ms
+                Thread.Sleep(500); // Wait for 500 ms
                 retryCount--;
+            }
+        }
+    }
+
+    public override void Dispose()
+    {
+        _fileWatcher?.Dispose();
+        base.Dispose();
+    }
+}
+
             }
         }
     }
