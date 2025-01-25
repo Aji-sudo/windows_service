@@ -78,14 +78,14 @@ jobs:
 
     - name: Create Test Folders and Files
       run: |
-        mkdir SourceFolder6
-        mkdir DestinationFolder6
-        echo "This is a test file" > SourceFolder6/testfile.txt
+        mkdir -p ${{ github.workspace }}/SourceFolder6
+        mkdir -p ${{ github.workspace }}/DestinationFolder6
+        echo "This is a test file" > ${{ github.workspace }}/SourceFolder6/testfile.txt
 
     - name: Start Windows Service
       run: |
-        cd ./publish
-        ./filemonitoring1.exe # Run the published service executable
+        cd ${{ github.workspace }}/publish
+        Start-Process -NoNewWindow -FilePath "./filemonitoring1.exe"
 
     - name: Wait for File Movement
       run: |
@@ -95,14 +95,17 @@ jobs:
     - name: Debug Folder Contents
       run: |
         echo "Source folder contents:"
-        Get-ChildItem -Path "SourceFolder6"
+        Get-ChildItem -Path "${{ github.workspace }}/SourceFolder6"
         echo "Destination folder contents:"
-        Get-ChildItem -Path "DestinationFolder6"
+        Get-ChildItem -Path "${{ github.workspace }}/DestinationFolder6"
 
     - name: Verify File Movement
       run: |
-        if (Test-Path -Path "DestinationFolder6/testfile.txt") {
+        if (Test-Path -Path "${{ github.workspace }}/DestinationFolder6/testfile.txt") {
           Write-Host "File moved successfully to DestinationFolder6."
         } else {
           Write-Error "File was not moved to DestinationFolder6."
         }
+
+
+
