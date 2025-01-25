@@ -410,7 +410,3 @@ public class Worker : BackgroundService
     }
 }
 
-            }
-        }
-    }
-}
